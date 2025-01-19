@@ -1,0 +1,42 @@
+import openpyxl
+from openpyxl.styles import Font, Alignment
+from openpyxl.utils import get_column_letter
+
+workbook = openpyxl.Workbook()
+sheet = workbook.active
+
+sheet.title = "Relatório de Vendas"
+
+headers = ["Produto", "Quantidade", "Preço Unitário", "Preço Total"]
+sheet.append(headers)
+
+for col_num, header in enumerate(headers, start=1):
+    cell = sheet.cell(row=1, column=col_num)
+    cell.font = Font(bold=True)
+    cell.alignment = Alignment(horizontal="center")
+
+dados = [
+    ["Produto A", 10, 15.5],
+    ["Produto B", 5, 30.0],
+    ["Produto C", 8, 12.75],
+]
+
+for item in dados:
+    produto, quantidade, preco_unitario = item
+    preco_total = quantidade * preco_unitario
+    sheet.append([produto, quantidade, preco_unitario, preco_total])
+
+for col in sheet.columns:
+    max_length = 0
+    col_letter = get_column_letter(col[0].column)  # Letra da coluna
+    for cell in col:
+        try:  # Para evitar erros se a célula estiver vazia
+            if cell.value:
+                max_length = max(max_length, len(str(cell.value)))
+        except:
+            pass
+    sheet.column_dimensions[col_letter].width = max_length + 2
+
+workbook.save("relatorio_vendas.xlsx")
+
+print("Planilha criada com sucesso!")
